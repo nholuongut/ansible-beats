@@ -1,0 +1,40 @@
+## Ansible managed configuration file for beats_
+## DO NOT EDIT MANUALLY
+
+{% if beats__modules is defined %}
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+{%endif%}
+
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false
+
+output:
+{% if beats__logstash_enabled %}
+  logstash:
+    enabled: {{ beats__logstash_enabled }}
+{% if beats__logstash_index is defined %}
+    index: {{ beats__logstash_index }}
+{% endif %}
+    hosts:
+      {{ beats__logstash_hosts | to_nice_yaml | indent(6) }}
+{%endif%}
+{% if beats__elasticsearch_enabled %}
+  elasticsearch:
+    hosts:
+      {{ beats__elasticsearch_hosts | to_nice_yaml | indent(6) }}
+
+    protocol: {{ beats__elasticsearch_protocol }}
+{% if beats__elasticsearch_user is defined %}
+    username: {{ beats__elasticsearch_user }}
+    password: {{ beats__elasticsearch_password }}
+{%endif%}
+{%endif%}
+
+{% if beats__extra_options is defined %}
+# Additional options added by beats_
+{{ beats__extra_options }}
+{%endif%}

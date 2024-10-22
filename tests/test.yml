@@ -1,0 +1,34 @@
+- hosts: test
+
+  roles:
+    - role: '../../'
+      elastic_repo__branch: 7.x
+      beats__shipper: filebeat
+      beats__autostart: false
+      beats__elasticsearch_enabled: true
+      beats__elasticsearch_hosts: ["192.168.1.1:9200", "192.168.1.2:9200"]
+      beats__modules: ['system.yml.j2']
+      beats__modules_sourcedir: "filebeat-modules/"
+      beats__extra_options: |
+        xpack.monitoring.enabled: true
+        logging.level: debug
+
+    - role: '../../'
+      elastic_repo__branch: 7.x
+      beats__shipper: metricbeat
+      beats__elasticsearch_enabled: true
+      beats__modules: ['system.yml.j2']
+      beats__modules_sourcedir: "metricbeat-modules/"
+      beats__extra_options: |
+        xpack.monitoring.enabled: true
+        logging.level: debug
+
+    - role: '../../'
+      elastic_repo__branch: 7.x
+      beats__shipper: heartbeat
+      beats__elasticsearch_enabled: true
+      beats__extra_options: |
+        heartbeat.monitors:
+          - type: icmp
+            schedule: '@every 10s'
+            hosts: ['127.0.0.1']

@@ -1,0 +1,8 @@
+---
+
+- name: Install {{ beats__shipper }}
+  apt:
+    name: "{{ beats__package_map[ beats__shipper ] }}"
+    state: "{{ beats__package_state }}"
+  notify:
+    - restart beat
